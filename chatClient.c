@@ -78,14 +78,25 @@ int main(int argc, char *argv[])
 
 	freeaddrinfo(servinfo); // all done with this structure
 
-	if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
-	    perror("recv");
-	    exit(1);
-	}
+	while (1) {
+    // Get user input
+    printf("You: ");
+    fgets(buf, MAXDATASIZE, stdin);
+    
+    // Send message to server
+    send(sockfd, buf, strlen(buf), 0);
 
-	buf[numbytes] = '\0';
+    // Receive response from server
+    memset(buf, 0, MAXDATASIZE);
+    int numbytes = recv(sockfd, buf, MAXDATASIZE - 1, 0);
+    if (numbytes <= 0) {
+        printf("Server disconnected.\n");
+        break;
+    }
 
-	printf("client: received '%s'\n",buf);
+    printf("Server: %s", buf);
+}
+
 
 	close(sockfd);
 
